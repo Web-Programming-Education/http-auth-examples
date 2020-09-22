@@ -1,0 +1,22 @@
+POST /users
+Host: localhost:3000
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "test@test.com", "password": "asdkjas" }
+
+###
+
+POST /login 
+Host: localhost:3000
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "test@test.com", "password": "asdkjas" }
+
+###
+
+GET /employees
+Host: localhost:3000
+Content-Type: application/json
+Accept: application/json

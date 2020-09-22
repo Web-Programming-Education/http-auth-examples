@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Auth</title>
+</head>
+<body>
+    <div>
+      <code><pre>
+POST /users
+Host: localhost:3000
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "test@test.com", "password": "asdkjas" }
+      </pre></code>
+      <button onclick="register()">Register</button>
+    </div>
+
+    <div>
+      <code><pre>
+POST /login 
+Host: localhost:3000
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "test@test.com", "password": "asdkjas" }
+      </pre></code>
+      <button onclick="login()">Login</button>
+    </div>
+
+    <div>
+      <code><pre>
+GET /employees
+Host: localhost:3000
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MDA4MDEwNDYsImV4cCI6MTYwMDgwNDY0Nn0.cBk-C5zQhmJI4kK4yY4LLItZhitGl1FN5dHboG2iUQA
+      </pre></code>
+      <button onclick="getEmployeeData()">Get employee data from our api</button>
+    </div>
+
+    <div>
+      <code><pre>
+POST /v2/pet/findByStatus?status=available
+Host: https://petstore.swagger.io
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "test@test.com", "password": "asdkjas" }
+      </pre></code>
+      <button onclick="getPets()">Get data from another domain</button>
+    </div>
+  
+  <script>
+    const user = { "email": "test@test.com", "password": "asdkjas" }
+    
+    function register() {
+      return fetch(
+        'http://localhost:3000/users',
+        { 
+          method: 'POST', 
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(user) 
+        }
+      )
+    }
+
+    async function login() {
+      const response = await fetch(
+        'http://localhost:3000/login',
+        { 
+          method: 'POST', 
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(user) 
+        }
+      )
+      const jsonPayload = await response.json();
+      localStorage.setItem('token', jsonPayload.token)
+    }
+
+    function getEmployeeData() {
+      const token = localStorage.getItem('token')
+      
+      return fetch('http://localhost:3000/employees', 
+        { 
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          }
+        }
+      )
+    }
+    
+    function getPets() {
+      return fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available')
+    }
+  </script>
+</body>
+</html>
