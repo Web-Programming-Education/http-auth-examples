@@ -1,9 +1,7 @@
-var express = require('express');
-var session = require('express-session');
-var crypto = require('crypto');
+const express = require('express');
+const session = require('express-session');
+const crypto = require('crypto');
  
-const users = [];
-
 function encrypt(password) {
   return crypto.pbkdf2Sync(
     password, 
@@ -14,7 +12,9 @@ function encrypt(password) {
   ).toString('hex');
 }
 
-var app = express();
+const users = [];
+const port = 3000;
+const app = express();
  
 app.use(express.json());
 app.use(express.static('public'));
@@ -25,25 +25,33 @@ app.use(session({
   saveUninitialized: false
 }));
  
-app.post('/users', function (req, res) {  
-  if (!req.body.email || !req.body.password) {
+app.post('/register', function (req, res) {  
+  if ( !req.body.email 
+    || !req.body.password 
+    || typeof req.body.email !== 'string' 
+    || typeof req.body.email !== 'string'
+  ) {
     res.sendStatus(400);
   }
 
-  users.push({ email: req.body.email, password: encrypt(req.body.password) });
+  users.push({ email: req.body.email, passwordDerivative: encrypt(req.body.password) });
 
-  res.send('registered user with mail: ' + req.body.email);
+  res.status(201).send('registered user with mail: ' + req.body.email);
 })
 
 app.post('/login', function (req, res) {
-  if (!req.body.email || !req.body.password) {
+  if ( !req.body.email 
+    || !req.body.password 
+    || typeof req.body.email !== 'string' 
+    || typeof req.body.email !== 'string'
+  ) {
     res.sendStatus(400);
     return;
   }
 
   const encryptedPassword = encrypt(req.body.password);
 
-  if (users.some(u => u.email === req.body.email && u.password === encryptedPassword)) {
+  if (users.some(u => u.email === req.body.email && u.passwordDerivative === encryptedPassword)) {
     req.session.user = { email: req.body.email };
     res.sendStatus(200);
   } else {
@@ -72,7 +80,6 @@ app.get('/employees', function (req, res) {
   ]});
 });
 
-const port = 3000;
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 })

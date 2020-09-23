@@ -8,7 +8,7 @@
 <body>
     <div>
       <code><pre>
-POST /users
+POST /register
 Host: localhost:3000
 Content-Type: application/json
 Accept: application/json
@@ -57,7 +57,7 @@ Accept: application/json
 
     function register() {
       return fetch(
-        'http://localhost:3000/users',
+        'http://localhost:3000/register',
         { 
           method: 'POST', 
           headers: {

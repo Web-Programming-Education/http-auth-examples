@@ -1,12 +1,10 @@
-var express = require('express');
-var jwt = require('jsonwebtoken');
-var crypto = require('crypto');
- 
-const secret = 'askjdfhaldsjkf';
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
-const users = [];
-
-function getToken(authHeaderValue) {
+function getToken(req) {
+  const authHeaderValue = req.header('Authorization')
+  
   let [type, token] = authHeaderValue.split(' ');
   return token;
 }
@@ -21,30 +19,41 @@ function encrypt(password) {
   ).toString('hex');
 }
 
-var app = express();
+const secret = 'askjdfhaldsjkf';
+const users = [];
+const port = 3000;
+const app = express();
  
 app.use(express.json());
 app.use(express.static('public'));
  
-app.post('/users', function (req, res) {  
-  if (!req.body.email || !req.body.password) {
+app.post('/register', function (req, res) {  
+  if ( !req.body.email 
+    || !req.body.password 
+    || typeof req.body.email !== 'string' 
+    || typeof req.body.email !== 'string'
+  ) {
     res.sendStatus(400);
   }
 
-  users.push({ email: req.body.email, password: encrypt(req.body.password) });
+  users.push({ email: req.body.email, passwordDerivative: encrypt(req.body.password) });
 
-  res.send('registered user with mail: ' + req.body.email);
+  res.status(201).send('registered user with mail: ' + req.body.email);
 })
 
 app.post('/login', function (req, res) {
-  if (!req.body.email || !req.body.password) {
+  if ( !req.body.email 
+    || !req.body.password 
+    || typeof req.body.email !== 'string' 
+    || typeof req.body.email !== 'string'
+  ) {
     res.sendStatus(400);
   }
 
   const encryptedPassword = encrypt(req.body.password);
 
-  if (users.some(u => u.email === req.body.email && u.password === encryptedPassword)) {
-    var token = jwt.sign(
+  if (users.some(u => u.email === req.body.email && u.passwordDerivative === encryptedPassword)) {
+    const token = jwt.sign(
       { email: req.body.email },
       secret,
       { expiresIn: '1h' }
@@ -59,7 +68,13 @@ app.post('/login', function (req, res) {
 })
  
 app.get('/employees', function (req, res) {
-  const encryptedToken = getToken(req.header('Authorization'));
+  const encryptedToken = getToken(req);
+
+  if (!encryptedToken) {
+    res.setHeader('WWW-Authenticate', 'Bearer');
+    res.sendStatus(401);
+    return;
+  }
   
   try {
     const decodedToken = jwt.verify(encryptedToken, secret);
@@ -78,12 +93,11 @@ app.get('/employees', function (req, res) {
       }
     ]});
   } catch (e) {
-    res.setHeader("Location", "/login");
+    res.setHeader('WWW-Authenticate', 'Bearer');
     res.sendStatus(401);
   }
 })
 
-const port = 3000;
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 })
