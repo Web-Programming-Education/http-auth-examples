@@ -7,6 +7,7 @@
     "start": "nodemon cookies.js",
     "cookies": "nodemon cookies.js",
     "tokens": "nodemon tokens.js",
+    "withoutAuth": "nodemon withoutAuth.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -15,7 +16,9 @@
     "crypto": "^1.0.1",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^8.5.1"
+  },
+  "devDependencies": {
     "nodemon": "^2.0.4"
   }
 }
